@@ -7,14 +7,13 @@ import re
 
 RE_SYMM = re.compile("""
                      ^
-                     (?P<seq_num>\s*\d+)       # Sequential WHATIF numbering
-                     [ ]                       #
-                     (?P<res_type>[\w ]{2}\w)  # Residue type PDB
-                     [ ]
-                     \((?P<res_num>[\d ]{3}\d) # Residue number PDB
-                     (?P<res_ic>[A-Z ])\)      # Residue insertion code PDB
-                     (?P<chain>\w)             # Chain
-                     (?P<num_contacts>\s+\d+)  # Number of contacts
+                     (?P<seq_num>\s*\d+)           # Sequential WHAT IF number
+                     [ ]                           #
+                     (?P<res_type>[\w ]{2}\w[ \w]) # Residue type WHAT IF
+                     \((?P<res_num>[\d ]{3}\d)     # Residue number PDB
+                     (?P<res_ic>[A-Z ])\)          # Residue insertion code PDB
+                     (?P<chain>\w)                 # Chain
+                     (?P<num_contacts>\s+\d+)      # Number of contacts
                      \s*$
                      """, re.VERBOSE)
 
@@ -87,7 +86,7 @@ def parse_ss2_line(l):
     Raise ValueError if the line does not match the ss2 regex.
     """
     seq_num = l[0:5]         # Sequential WHAT IF numbering
-    res_typ = l[6:9]         # Reside type PDB
+    res_typ = l[6:10]        # Reside letters WI, 4 for [DR]NA, 3 for protein
     res_num = l[11:15]       # Residue number PDB
     res_ic = l[15:16]        # Residue insertion code PDB
     chain = l[17:18]         # Chain PDB

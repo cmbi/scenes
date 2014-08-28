@@ -50,8 +50,8 @@ def test_check_ss2_line_regex_nomatch_4():
 
 @raises(ValueError)
 def test_check_ss2_line_regex_nomatch_5():
-    """Test that residue type cannot contain + (example of other characters than
-    digits and word characters)."""
+    """Test that residue type cannot contain + (example of other characters
+    than digits and word characters)."""
     line = '   35 SE+ (  40A)A              0       '
     check_ss2_line_regex(line, None, None, None, None, None, None)
 
@@ -79,9 +79,10 @@ def test_check_ss2_line_regex_nomatch_8():
 
 def test_check_ss2_line_regex_ok():
     """Tests that a valid line does not raise any exceptions."""
+    # Amino acid
     line = '   35 SER (  40A)A              0       '
     seq_num = '   35'
-    res_typ = 'SER'
+    res_typ = 'SER '
     res_num = '  40'
     res_ic = 'A'
     chain = 'A'
@@ -89,13 +90,38 @@ def test_check_ss2_line_regex_ok():
     check_ss2_line_regex(line, seq_num, res_typ, res_num, res_ic, chain,
                          n_contacts)
 
+    # Halide
     line = '  160  CL ( 173 )A              2       '
     seq_num = '  160'
-    res_typ = ' CL'
+    res_typ = ' CL '
     res_num = ' 173'
     res_ic = ' '
     chain = 'A'
     n_contacts = '              2'
+    result = check_ss2_line_regex(line, seq_num, res_typ, res_num, res_ic,
+                                  chain, n_contacts)
+    eq_(result, None)
+
+    # DNA
+    line = '    1 DTHY(4001 )A              4       '
+    seq_num = '    1'
+    res_typ = 'DTHY'
+    res_num = '4001'
+    res_ic = ' '
+    chain = 'A'
+    n_contacts = '              4'
+    result = check_ss2_line_regex(line, seq_num, res_typ, res_num, res_ic,
+                                  chain, n_contacts)
+    eq_(result, None)
+
+    # RNA
+    line = '    1 DTHY(4001 )A              4       '
+    seq_num = '    1'
+    res_typ = 'DTHY'
+    res_num = '4001'
+    res_ic = ' '
+    chain = 'A'
+    n_contacts = '              4'
     result = check_ss2_line_regex(line, seq_num, res_typ, res_num, res_ic,
                                   chain, n_contacts)
     eq_(result, None)
@@ -142,29 +168,40 @@ def test_parse_ss2_line_ok():
     eq_('173  mol A', selection)
     eq_(2, n_contacts)
 
+    line = '    1 DTHY(4001 )A              4       '
+
 
 @raises(IOError)
 def test_parse_symm_contacts_ioerr_file_not_found():
+    """Test that IOError is raised if file path is incorrect."""
     parse_sym_contacts('103l.ss2.bz2')
 
 
 @raises(IOError)
 def test_parse_symm_contacts_ioerr_uncompressed():
-    parse_sym_contacts(os.path.join('yas_scenes', 'tests', 'files', '103l.ss2'))
+    """Test that an IOError is raised if ss2 file is uncompressed."""
+    parse_sym_contacts(os.path.join(
+        'yas_scenes', 'tests', 'files', '103l.ss2'))
 
 
 @raises(TypeError)
 def test_parse_symm_contacts_none():
+    """Test that TypeError is raised if ss2 file path is None."""
     parse_sym_contacts(None)
 
 
 @raises(ValueError)
 def test_parse_symm_contacts_valerr():
+    """Test that ValueError is raised if ss2 file has incorrect content."""
     parse_sym_contacts(os.path.join('yas_scenes', 'tests', 'files',
                                     '103l_valerr.ss2.bz2'))
 
 
 def test_parse_symm_contacts_103l():
+    """Test that 103l.ss2.bz2 is parsed correctly.
+
+    103l contains protein and halides
+    """
     try:
         with open(os.path.join('yas_scenes', 'tests', 'files',
                                '103l.ss2.json'), 'r') as f:
@@ -174,6 +211,44 @@ def test_parse_symm_contacts_103l():
 
     result = parse_sym_contacts(os.path.join('yas_scenes', 'tests', 'files',
                                              '103l.ss2.bz2'))
+    eq_(len(symm_contacts), len(result))
+    for k, v in symm_contacts.iteritems():
+        eq_(result[k], v)
+
+
+def test_parse_symm_contacts_1a02():
+    """Test that 1a02.ss2.bz2 is parsed correctly.
+
+    1a02 contains DNA and protein
+    """
+    try:
+        with open(os.path.join('yas_scenes', 'tests', 'files',
+                               '1a02.ss2.json'), 'r') as f:
+            symm_contacts = json.load(f)
+    except IOError as e:
+        raise e
+
+    result = parse_sym_contacts(os.path.join('yas_scenes', 'tests', 'files',
+                                             '1a02.ss2.bz2'))
+    eq_(len(symm_contacts), len(result))
+    for k, v in symm_contacts.iteritems():
+        eq_(result[k], v)
+
+
+def test_parse_symm_contacts_1a34():
+    """Test that 1a34.ss2.bz2 is parsed correctly.
+
+    1a34 contains RNA and protein
+    """
+    try:
+        with open(os.path.join('yas_scenes', 'tests', 'files',
+                               '1a34.ss2.json'), 'r') as f:
+            symm_contacts = json.load(f)
+    except IOError as e:
+        raise e
+
+    result = parse_sym_contacts(os.path.join('yas_scenes', 'tests', 'files',
+                                             '1a34.ss2.bz2'))
     eq_(len(symm_contacts), len(result))
     for k, v in symm_contacts.iteritems():
         eq_(result[k], v)
