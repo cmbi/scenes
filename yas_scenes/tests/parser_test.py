@@ -58,8 +58,11 @@ def test_check_ss2_line_regex_nomatch_5():
 
 @raises(ValueError)
 def test_check_ss2_line_regex_nomatch_6():
-    """Test that residue number cannot contain character."""
+    """Test that residue number cannot contain character except dash."""
     line = '   35 SER (  4AA)A              0       '
+    check_ss2_line_regex(line, None, None, None, None, None, None)
+
+    line = '    1 GLY (  -1 )A              0       '
     check_ss2_line_regex(line, None, None, None, None, None, None)
 
 
@@ -115,13 +118,25 @@ def test_check_ss2_line_regex_ok():
     eq_(result, None)
 
     # RNA
-    line = '    1 DTHY(4001 )A              4       '
+    line = '  152 OADE(   5 )B             10       '
+    seq_num = '  152'
+    res_typ = 'OADE'
+    res_num = '   5'
+    res_ic = ' '
+    chain = 'B'
+    n_contacts = '             10'
+    result = check_ss2_line_regex(line, seq_num, res_typ, res_num, res_ic,
+                                  chain, n_contacts)
+    eq_(result, None)
+
+    # Negative PDB number start
+    line = '    1 GLY (  -1 )A              0       '
     seq_num = '    1'
-    res_typ = 'DTHY'
-    res_num = '4001'
+    res_typ = 'GLY '
+    res_num = '   -1'
     res_ic = ' '
     chain = 'A'
-    n_contacts = '              4'
+    n_contacts = '              0'
     result = check_ss2_line_regex(line, seq_num, res_typ, res_num, res_ic,
                                   chain, n_contacts)
     eq_(result, None)
@@ -143,6 +158,11 @@ def test_int_check_ss2_res_num():
 def test_int_check_ss2_n_contacts():
     """Test that n_contacts cannot be character."""
     int_check_ss2(seq_num='1', res_num='1', num_contacts='A')
+
+
+def test_int_check_ss2_res_num_ok():
+    """Test that res_num int string can be parsed to int."""
+    int_check_ss2(seq_num='1', res_num='-1', num_contacts='0')
 
 
 @raises(TypeError)
@@ -169,6 +189,19 @@ def test_parse_ss2_line_ok():
     eq_(2, n_contacts)
 
     line = '    1 DTHY(4001 )A              4       '
+    selection, n_contacts = parse_ss2_line(line)
+    eq_('4001  mol A', selection)
+    eq_(4, n_contacts)
+
+    line = '  152 OADE(   5 )B             10       '
+    selection, n_contacts = parse_ss2_line(line)
+    eq_('5  mol B', selection)
+    eq_(10, n_contacts)
+
+    line = '    1 GLY (  -1 )A              0       '
+    selection, n_contacts = parse_ss2_line(line)
+    eq_('-1  mol A', selection)
+    eq_(0, n_contacts)
 
 
 @raises(IOError)
