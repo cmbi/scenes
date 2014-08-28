@@ -64,7 +64,8 @@ def symmetry_contacts(pdb_file_path, yasara_scene_path, symmetry_contacts_dict,
         return False, msg
 
     if not has_expected_log_count_symm(num_lines, symmetry_contacts_dict):
-        msg = 'Error creating YASARA scene: some commands could not be executed'
+        msg = 'Error creating YASARA scene:' \
+            ' some commands could not be executed'
         return False, msg
 
     return success, msg

@@ -61,13 +61,15 @@ def create_ion_scene(pdb_path, sce_path, ion_sites):
             <ResNumber> (<ResNumber> ...) mol <MolName> e.g.
             '190 193 225 227 mol B'
 
-        It is import PDB numbering (and not WHAT IF or other numbering) is used.
+        It is import the numbering of the ions and ligands is PDB numbering
+        (and not WHAT IF or other numbering).
 
-    Only the ion sites (ion + ligands) wil be shown, all other atoms are hidden.
+    Only the ion sites (ion + ligands) wil be shown, all other atoms are
+    hidden.
     The scene is zoomed in on the first ion site.
 
-    RuntimeErrors will be raised if the pdb_path is invalid, if the residue name
-    is more than 4 digits, etc.
+    RuntimeErrors will be raised if the pdb_path is invalid, if the residue
+    name is more than 4 digits, etc.
 
     Unrealistic selections don't always raise a RuntimeError: non-existing 'Zn'
     or non- existing residue numbers, for example.
@@ -118,10 +120,11 @@ def create_sym_scene(pdb_path, sce_path, sym_contacts):
             '3 Mol A'
         the values incidate the number of symmetry contacts
 
-        It is import PDB numbering (and not WHAT IF or other numbering) is used.
+        It is import the numbering of the ions and ligands is PDB numbering
+        (and not WHAT IF or other numbering).
 
-    A Calpha trace will be shown for the structure. Sidechains will be shown for
-    residues involved in symmetry contacts.
+    A Calpha trace will be shown for the structure. Sidechains will be shown
+    for residues involved in symmetry contacts.
     A color code indicates the number of symmetry contacts. This number will be
     scaled to be between 0 and 1 by dividing by 10. Everything above 10 will
     then have the same color.
@@ -129,8 +132,8 @@ def create_sym_scene(pdb_path, sce_path, sym_contacts):
         0.0: yellow
         1.0: blue
 
-    RuntimeErrors will be raised if the pdb_path is invalid, if the residue name
-    is more than 4 digits, etc.
+    RuntimeErrors will be raised if the pdb_path is invalid, if the residue
+    name is more than 4 digits, etc.
 
     Unrealistic selections don't always raise a RuntimeError: non-existing 'Zn'
     or non- existing residue numbers, for example.
