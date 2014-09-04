@@ -171,7 +171,8 @@ def write_whynot(pdb_id, reason, db, why_not_file_path=None):
 def main():
     """Create YASARA scenes."""
 
-    parser = argparse.ArgumentParser(description="Create a YASARA scene.")
+    parser = argparse.ArgumentParser(description="Create a YASARA scene.",
+                                     prog="scenes")
     parser.add_argument("-v", "--verbose", help="show verbose output",
                         action="store_true")
     parser.add_argument("ypid", help="YASARA process id. Warning: specify a "
