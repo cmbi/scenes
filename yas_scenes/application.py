@@ -69,6 +69,7 @@ def ion(args):
 
 
 def set_debug_loggers():
+    """Set the loglevel of all loggers to DEBUG."""
     # root logger
     logging.getLogger().setLevel(logging.DEBUG)
     formatter = logging.Formatter("%(asctime)s | %(levelname)-7s | %(message)s"
@@ -76,6 +77,14 @@ def set_debug_loggers():
     for handler in logging.getLogger().handlers:
         handler.setFormatter(formatter)
     _log.debug('Set verbose logging')
+
+
+def create_file_logger(log_path):
+    """Create a log file."""
+    # root logger
+    _root = logging.getLogger()
+    _file = logging.FileHandler(log_path, 'w')
+    _root.addHandler(_file)
 
 
 def ensure_dir_existence(scene_dir):
@@ -93,21 +102,13 @@ def ensure_dir_existence(scene_dir):
 def ss2(args):
     """Create symmetry contacts YASARA scene
 
-    Example:
-    pdb = '/path/to/pdb/pdb1crn.ent'
-    scene = 'sce/1crn_sym_contacts.sce'
-    sym_contacts = {'15 mol A': 1,
-                    '16 mol A': 1,
-                    '19 mol A': 2,
-                    '21 mol A': 1,
-                    '22 mol A': 1,
-                    '25 mol A': 2,
-                    '28 mol A': 1,
-                    '36 mol A': 5,
-                    '35 mol A': 7,
-                    '29 mol A': 3}
-    log = 'logs/1crn_sym_contacts'
-    symmetry_contacts(pdb, scene, sym_contacts, 123, log)
+    This function wil create in SCENES_ROOT/ss2/pdbid
+    - either a YASARA scene or a WHY_NOT file
+    - the YASARA log
+    - this program's log
+
+    SCENES_ROOT is configured in localconfig
+    pdbid is a command line argument
     """
     scene_dir = os.path.join(pyconfig.get('SCENES_ROOT'), 'ss2', args.pdb_id)
     ensure_dir_existence(scene_dir)
@@ -115,6 +116,12 @@ def ss2(args):
     scene_nam = scene_nam['ss2']
     scene = '{}_{}.sce'.format(args.pdb_id, scene_nam)
     scene_path = os.path.join(scene_dir, scene)
+
+    log = 'scenes_{}_{}.log'.format(args.pdb_id, scene_nam)
+    log_path = os.path.join(scene_dir, log)
+    create_file_logger(log_path)
+    if args.verbose:
+        set_debug_loggers()
 
     sym_contacts = parse_sym_contacts(ss2=args.ss2)
 
@@ -187,8 +194,5 @@ def main():
                        type=lambda x: is_valid_file(parser, x))
     p_ss2.set_defaults(func=ss2)
     args = parser.parse_args()
-
-    if args.verbose:
-        set_debug_loggers()
 
     args.func(args)
