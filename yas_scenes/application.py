@@ -109,11 +109,14 @@ def ss2(args):
 
     SCENES_ROOT is configured in localconfig
     pdbid is a command line argument
+
+    SCENES_NAME is configured in localconfig
+    and determines file names and WHY_NOT database name
     """
     scene_dir = os.path.join(pyconfig.get('SCENES_ROOT'), 'ss2', args.pdb_id)
     ensure_dir_existence(scene_dir)
-    scene_nam = pyconfig.get('SCENES_NAME')
-    scene_nam = scene_nam['ss2']
+    scene_name = pyconfig.get('SCENES_NAME')
+    scene_nam = scene_name['ss2'][0]
     scene = '{}_{}.sce'.format(args.pdb_id, scene_nam)
     scene_path = os.path.join(scene_dir, scene)
 
@@ -140,7 +143,8 @@ def ss2(args):
         # Create a WHY NOT entry
         file_path = os.path.join(scene_dir, '{}_{}.whynot.check'.format(
             args.pdb_id, scene_nam))
-        write_whynot(args.pdb_id, msg, 'SCENE_SYMM_CON', file_path)
+        db = '{}_SCENE_{}'.format(args.source, scene_name['ss2'][1])
+        write_whynot(args.pdb_id, msg, db, file_path)
     else:
         _log.info('{}: {}'.format(args.pdb_id, msg))
 
@@ -167,8 +171,7 @@ def write_whynot(pdb_id, reason, db, why_not_file_path=None):
 def main():
     """Create YASARA scenes."""
 
-    parser = argparse.ArgumentParser(
-        description="Create a YASARA scene.")
+    parser = argparse.ArgumentParser(description="Create a YASARA scene.")
     parser.add_argument("-v", "--verbose", help="show verbose output",
                         action="store_true")
     parser.add_argument("ypid", help="YASARA process id. Warning: specify a "
@@ -178,6 +181,8 @@ def main():
                         type=lambda x: is_valid_file(parser, x))
     parser.add_argument("pdb_id", help="PDB accession code.",
                         type=lambda x: is_valid_pdbid(parser, x))
+    parser.add_argument("source", choices=["PDB", "REDO"],
+                        help="PDB file source")
     subparsers = parser.add_subparsers(title="mode",
                                        description="YASARA scene type",
                                        help="ion for ion sites, symm for "

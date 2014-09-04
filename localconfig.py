@@ -7,7 +7,9 @@ YASARA_DIR = '/home/wtouw/bin/yasara'
 # Root of scenes directory structure
 SCENES_ROOT = '/data0/scenes'
 
-# Scene dir names and file names
-# will be key/pdbid/pdbid_value.sce
+# Scene dir names and file names will be
+# key/pdbid/pdbid_value[0].sce
+# WHY_NOT database name will be
+# [PDB/REDO]_SCENE_value[1]
 # keys should not be changed
-SCENES_NAME = {'ss2': 'sym-contacts'}
+SCENES_NAME = {'ss2': ['sym-contacts', 'SYMM_CON']}
