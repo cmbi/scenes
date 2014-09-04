@@ -36,7 +36,7 @@ def prepare_yasara(pid, yasara_log=None, n_cpu=1):
     if yasara_log:
         # Log
         yas.RecordLog(yasara_log, append="No")
-        _log.debug("Logging YASARA commands to {}...".format(yasara_log))
+        _log.debug("Logging YASARA commands to {}.log...".format(yasara_log))
     else:
         # Disable Console
         _log.debug("Disabling YASARA console...")

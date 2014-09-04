@@ -43,7 +43,7 @@ def symmetry_contacts(pdb_file_path, yasara_scene_path, symmetry_contacts_dict,
                          sym_contacts=symmetry_contacts_dict)
         msg = 'Scene created'
         success = True
-        _log.debug('msg: {}'.format(yasara_scene_path))
+        _log.debug('{}: {}'.format(msg, yasara_scene_path))
     except Exception as e:
         # The scene will not be created if an exception is raised
         _log.debug(e)
@@ -111,7 +111,7 @@ def has_logged_exit(yasara_log):
         with open(yasara_log + '.log', 'r') as f:
             for last_line in f:
                 num_lines = num_lines + 1
-            _log.debug('{} has {} lines'.format(yasara_log, num_lines))
+            _log.debug('Log {}.log has {} lines'.format(yasara_log, num_lines))
             if re.match('^>Exit$', last_line):
                 _log.debug('Exit found in last line of {}'.format(yasara_log))
                 exit_present = True
