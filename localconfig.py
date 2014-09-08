@@ -5,7 +5,7 @@
 YASARA_DIR = '/home/wtouw/bin/yasara'
 
 # Root of scenes directory structure
-SCENES_ROOT = '/data0/scenes'
+SCENES_ROOT = '/data1/lists/redo/scenes'
 
 # Scene dir names and file names will be
 # key/pdbid/pdbid_value[0].sce

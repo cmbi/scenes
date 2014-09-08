@@ -105,6 +105,18 @@ def test_check_ss2_line_regex_ok():
                                   chain, n_contacts)
     eq_(result, None)
 
+    # Metal
+    line = ' 2137 NA  ( 401 )A              0       '
+    seq_num = ' 2137'
+    res_typ = 'NA  '
+    res_num = ' 401'
+    res_ic = ' '
+    chain = 'A'
+    n_contacts = '              0'
+    result = check_ss2_line_regex(line, seq_num, res_typ, res_num, res_ic,
+                                  chain, n_contacts)
+    eq_(result, None)
+
     # DNA
     line = '    1 DTHY(4001 )A              4       '
     seq_num = '    1'

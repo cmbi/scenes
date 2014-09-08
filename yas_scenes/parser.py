@@ -9,8 +9,8 @@ RE_SYMM = re.compile("""
                      ^
                      (?P<seq_num>\s*\d+)           # Sequential WHAT IF number
                      [ ]                           #
-                     (?P<res_type>[\w ]{2}\w[ \w]) # Residue type WHAT IF
-                     \((?P<res_num>[\d -]{3}\d)     # Residue number PDB
+                     (?P<res_type>\s*\w[ \w]{0,3}) # Residue type WHAT IF
+                     \((?P<res_num>[\d -]{3}\d)    # Residue number PDB
                      (?P<res_ic>[A-Z ])\)          # Residue insertion code PDB
                      (?P<chain>\w)                 # Chain
                      (?P<num_contacts>\s+\d+)      # Number of contacts
@@ -27,7 +27,7 @@ def check_ss2_line_regex(l, seq_num, res_typ, res_num, res_ic, chain,
     """
     m = re.match(RE_SYMM, l)
     if not m:
-        raise ValueError('Unexpected ss2 file format')
+        raise ValueError('Unexpected ss2 file format: {}'.format(l))
 
 
 def int_check_ss2(seq_num, res_num, num_contacts):
