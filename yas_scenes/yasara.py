@@ -20,9 +20,10 @@
 
 import os
 import sys
-import pyconfig
 
-yasara_dir = pyconfig.get('YASARA_DIR')
+from settings import settings
+
+yasara_dir = settings['YASARA_DIR']
 sys.path.append(os.path.join(yasara_dir, 'pym'))
 sys.path.append(os.path.join(yasara_dir, 'plg'))
 

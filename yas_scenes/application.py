@@ -3,11 +3,11 @@ _log = logging.getLogger(__name__)
 
 import argparse
 import errno
-import pyconfig
 import re
 import os
 
 from yas_scenes.parser import parse_sym_contacts
+from yas_scenes.settings import settings
 from yas_scenes.tasks import symmetry_contacts
 
 
@@ -107,15 +107,20 @@ def ss2(args):
     - the YASARA log
     - this program's log
 
-    SCENES_ROOT is configured in localconfig
+    SCENES_ROOT is configured in scenes_settings
     pdbid is a command line argument
 
-    SCENES_NAME is configured in localconfig
+    SCENES_NAME is configured in scenes_settings
     and determines file names and WHY_NOT database name
     """
-    scene_dir = os.path.join(pyconfig.get('SCENES_ROOT'), 'ss2', args.pdb_id)
+    if args.source == 'PDB':
+        scene_dir = os.path.join(settings['PDB_SCENES_ROOT'],
+                                 'ss2', args.pdb_id)
+    elif args.source == 'REDO':
+        scene_dir = os.path.join(settings['REDO_SCENES_ROOT'],
+                                 'ss2', args.pdb_id)
     ensure_dir_existence(scene_dir)
-    scene_name = pyconfig.get('SCENES_NAME')
+    scene_name = settings['SCENES_NAME']
     scene_nam = scene_name['ss2'][0]
     scene = '{}_{}.sce'.format(args.pdb_id, scene_nam)
     scene_path = os.path.join(scene_dir, scene)
