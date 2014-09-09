@@ -21,6 +21,5 @@ setup(
         'yas_scenes',
         'yas_scenes.tests',
     ],
-    py_modules=['localconfig'],
     scripts=['scripts/scenes'],
 )

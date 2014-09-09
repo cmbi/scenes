@@ -63,3 +63,5 @@ Session.vim
 sce/
 logs/
 scripts/*.sh
+pdb/
+reod/
