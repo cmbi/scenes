@@ -62,4 +62,4 @@ Session.vim
 # scenes
 sce/
 logs/
-scripts/run_ss2_redo.sh
+scripts/*.sh

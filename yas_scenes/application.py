@@ -143,7 +143,7 @@ def ss2(args):
         # Create a WHY NOT entry
         file_path = os.path.join(scene_dir, '{}_{}.whynot.check'.format(
             args.pdb_id, scene_nam))
-        db = '{}_SCENE_{}'.format(args.source, scene_name['ss2'][1])
+        db = '{}_SCENES_{}'.format(args.source, scene_name['ss2'][1])
         write_whynot(args.pdb_id, msg, db, file_path)
     else:
         _log.info('{}: {}'.format(args.pdb_id, msg))
@@ -160,8 +160,7 @@ def write_whynot(pdb_id, reason, db, why_not_file_path=None):
     _log.warn('Writing WHY NOT entry.')
     try:
         with open(why_not_file_path, 'w') as whynot:
-            whynot.write('COMMENT: {}\n{},{}\n'.format(reason, db.upper(),
-                                                       pdb_id))
+            whynot.write('COMMENT: {}\n{},{}\n'.format(reason, db, pdb_id))
             return True
     except IOError as ex:
         _log.error(ex)
