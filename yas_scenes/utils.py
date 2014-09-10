@@ -5,6 +5,8 @@ import errno
 import os
 import re
 
+from yas_scenes.settings import settings
+
 
 PDB_ID_PAT = re.compile(r"^[0-9a-zA-Z]{4}$")
 
@@ -75,6 +77,41 @@ def set_debug_loggers():
     for handler in logging.getLogger().handlers:
         handler.setFormatter(formatter)
     _log.debug('Set verbose logging')
+
+
+def set_dir_log_wn(args, mode):
+    """Scene dir, scene path, log, verbose log, yasara log, why_not.
+
+    Return scene path and yasara log, why_not path and db
+
+    Raise an OSError if the dir could not be created or is not writable, etc.
+    """
+    if args.source == 'PDB':
+        scene_dir = os.path.join(settings['PDB_SCENES_ROOT'],
+                                 mode, args.pdb_id)
+    elif args.source == 'REDO':
+        scene_dir = os.path.join(settings['REDO_SCENES_ROOT'],
+                                 mode, args.pdb_id)
+    ensure_dir_existence(scene_dir)
+    scene_name = settings['SCENES_NAME']
+    scene_nam = scene_name[mode][0]
+    scene = '{}_{}.sce'.format(args.pdb_id, scene_nam)
+    scene_path = os.path.join(scene_dir, scene)
+
+    log = 'scenes_{}_{}.log'.format(args.pdb_id, scene_nam)
+    log_path = os.path.join(scene_dir, log)
+    create_file_logger(log_path)
+    if args.verbose:
+        set_debug_loggers()
+
+    yas_log = '{}_{}'.format(args.pdb_id, scene_nam)
+    yas_log_path = os.path.join(scene_dir, yas_log)
+
+    wn_file_path = os.path.join(scene_dir, '{}_{}.whynot.check'.format(
+        args.pdb_id, scene_nam))
+    wn_db = '{}_SCENES_{}'.format(args.source, scene_name[mode][1])
+
+    return scene_path, yas_log_path, wn_file_path, wn_db
 
 
 def write_whynot(pdb_id, reason, db, why_not_file_path=None):

@@ -14,16 +14,45 @@ def ion_sites(pdb_file_path, yasara_scene_path, ion_ligand_dict,
               yasara_pid, yasara_log):
     """Creates a YASARA scene displaying ion sites.
 
-    Create a WHY_NOT file if the scene cannot be created.
+    Return a boolean indicating whether everything went succesful
+    Return also a string reporting the most important reason why things went
+        ok or went wrong.
     """
     success = False
-    prepare_yasara(pid=yasara_pid, yasara_log=yasara_log)
-    create_ion_scene(pdb_path=pdb_file_path, sce_path=yasara_scene_path,
-                     ion_sites=ion_ligand_dict)
-    success = exit_yasara()
-    if success:
-        return has_logged_exit(yasara_log)
-    return success
+    try:
+        # Set pid and open a log file
+        prepare_yasara(pid=yasara_pid, yasara_log=yasara_log)
+        # Create and save the scene
+        create_ion_scene(pdb_path=pdb_file_path, sce_path=yasara_scene_path,
+                         ion_sites=ion_ligand_dict)
+        msg = 'Scene created'
+        success = True
+        _log.debug('{}: {}'.format(msg, yasara_scene_path))
+    except Exception as e:
+        # The scene will not be created if an exception is raised
+        _log.debug(e)
+        _log.error('Scene {} could not be created!'.format(yasara_scene_path))
+        msg = 'Error creating YASARA scene'
+        return False, msg
+    finally:
+        # Exit and close log
+        exit = exit_yasara()
+
+    if not exit:
+        msg = 'Error terminating YASARA'
+        return False, msg
+
+    has_exit, num_lines = has_logged_exit(yasara_log)
+    if not has_exit:
+        msg = 'Error terminating YASARA: no Exit statement in YASARA log'
+        return False, msg
+
+    if not has_expected_log_count_ions(num_lines, ion_ligand_dict):
+        msg = 'Error creating YASARA scene:' \
+            ' some commands could not be executed'
+        return False, msg
+
+    return success, msg
 
 
 def symmetry_contacts(pdb_file_path, yasara_scene_path, symmetry_contacts_dict,
@@ -69,6 +98,40 @@ def symmetry_contacts(pdb_file_path, yasara_scene_path, symmetry_contacts_dict,
         return False, msg
 
     return success, msg
+
+
+def has_expected_log_count_ions(found_log_lines, ion_ligand_dict):
+    """Returns True if the number of found log lines equals the expected number.
+
+    The expected number of logs is calculated as follows (pseudocode):
+        +6 (newline, set CPU number, load PDB, set style, hide all (arrows))
+        loop over all ions:
+            +6 for ListRes ion
+            +2 for ion show, style
+            loop over all residues:
+                +2 show, style
+        +3 (color background, stick, ballstick)
+        +6 for ListRes ion
+        +4 (center, zoom, save, exit)
+    """
+    head = 6
+    tail = 13
+    rest = 0
+    for l in ion_ligand_dict.itervalues():
+        rest = rest + 8
+        for ligres in l[0]:
+            rest = rest + 2
+    expected = head + rest + tail
+
+    if not found_log_lines == expected:
+        _log.error('Number of log lines ({}) not equal to expected number of '
+                   'log lines ({})'.format(found_log_lines, expected))
+    else:
+        _log.debug('Number of log lines ({}) equal to expected number of '
+                   'log lines ({})'.format(found_log_lines, expected))
+
+    return found_log_lines == expected
+    return True
 
 
 def has_expected_log_count_symm(found_log_lines, symmetry_contacts):

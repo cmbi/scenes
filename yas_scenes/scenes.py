@@ -47,27 +47,35 @@ def prepare_yasara(pid, yasara_log=None, n_threads=1):
     yas.Processors(cputhreads=n_threads)
 
 
-# TODO HideArrowAll, ShowArrow(Start="AtAtom", startatom, End="AtAtom", endatom,
-#                              Radius=0.1, Heads=0, Color="grey")
 def create_ion_scene(pdb_path, sce_path, ion_sites):
     """Create a YASARA scene displaying ion sites.
 
     pdb_path is the path to the PDB file
     sce_path is the path of the YASARA scene to be created
     ion_sites is a dictionary of the ion sites to display.
-        the keys are YASARA ion atom selection strings (one key = one site):
-            <AtomName> res <ResNumber> mol <MolName> e.g.
-            'Zn res 316 mol B'
-        the values are YASARA residue selection strings (one string for all
-        coordinating residues):
-            <ResNumber> (<ResNumber> ...) mol <MolName> e.g.
-            '190 193 225 227 mol B'
+        The keys are YASARA ion selection strings:
+            <PDBAtomName> res <PDBResNumberWithInsertionCode> mol <MolName>
+            e.g. 'ZN res 262 mol A'
+        The values are lists:
+            The first element is a list of YASARA selection strings
+            of residues bound to the ion.
+            <PDBResNumberWithInsertionCode> mol <MolName>
+            e.g. ['94  mol A', '96  mol A', '106  mol A', '119  mol A']
 
-        It is important the numbering of the ions and ligands is PDB numbering
-        (and not WHAT IF or other numbering).
+            The second element is a dict
+            The keys are YASARA atom selection strings (as above)
+            The values are distances defined by the atom to the ion.
+
+    {'<PDBAtomName> res <ResNumberWithInsertionCode> mol <MolName>':
+        [
+            [<PDBResNumberWithInsertionCode> mol <MolName>, ]
+            {<PDBAtomName> res <ResNumberWithInsertionCode> mol <MolName>:
+             distance}]}
+
+    Residue insertion codes are included in the residue number.
 
     Only the ion sites (ion + ligands) wil be shown, all other atoms are
-    hidden.
+    hidden. Arrows between ions and atoms are hidden.
     The scene is zoomed in on the first ion site.
 
     RuntimeErrors will be raised if the pdb_path is invalid, if the residue
@@ -85,16 +93,22 @@ def create_ion_scene(pdb_path, sce_path, ion_sites):
     # Hide everything at first
     yas.Style(backbone="stick", sidechain="stick")
     yas.HideAll()
+    yas.HideArrowAll()
 
     # Then show the ion sites
-    for ion, ligands in ion_sites.iteritems():
+    for ion, values in ion_sites.iteritems():
         # ions..
-        yas.ShowAtom(ion)
-        yas.BallAtom(ion)
+        # Instead of dealing with capitalized letters
+        # we ask YASARA for the atom
+        ion_at = yas.ListRes(ion)
+        yas.ShowAtom(ion_at)
+        yas.BallAtom(ion_at)
 
         # ..and ligands
-        yas.ShowRes(ligands)
-        yas.StickRes(ligands)
+        ligands = values[0]
+        for ligand in ligands:
+            yas.ShowRes(ligand)
+            yas.StickRes(ligand)
 
     # Nice visualisation
     yas.ColorBG("000040", "30c0ff")
@@ -103,8 +117,9 @@ def create_ion_scene(pdb_path, sce_path, ion_sites):
 
     # Zoom in on first site
     ion1 = ion_sites.iterkeys().next()
-    yas.CenterAtom(ion1, coordsys="Global")
-    yas.ZoomAtom(ion1, steps=0)
+    atom = yas.ListRes(ion1)
+    yas.CenterAtom(atom[0], coordsys="Global")
+    yas.ZoomAtom(atom[0], steps=0)
 
     # Save scene
     _log.debug("Saving YASARA scene to file {}".format(sce_path))
