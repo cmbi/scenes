@@ -1,0 +1,46 @@
+{
+    "HG res 495  mol A": [
+        [
+            "135  mol A", 
+            "136  mol A", 
+            "137  mol A", 
+            "137  mol A", 
+            "138  mol A", 
+            "205  mol A", 
+            "205  mol A", 
+            "206  mol A"
+        ], 
+        {
+            "N res 137  mol A": 3.425, 
+            "N res 138  mol A": 4.063, 
+            "N res 205  mol A": 4.07, 
+            "N res 206  mol A": 3.638, 
+            "O res 135  mol A": 2.995, 
+            "O res 136  mol A": 3.998, 
+            "O res 137  mol A": 3.193, 
+            "O res 205  mol A": 3.372
+        }
+    ], 
+    "ZN res 262  mol A": [
+        [
+            "94  mol A", 
+            "94  mol A", 
+            "96  mol A", 
+            "96  mol A", 
+            "106  mol A", 
+            "119  mol A", 
+            "119  mol A", 
+            "199  mol A"
+        ], 
+        {
+            "ND1 res 119  mol A": 1.977, 
+            "ND1 res 94  mol A": 4.288, 
+            "ND1 res 96  mol A": 4.162, 
+            "NE2 res 119  mol A": 4.084, 
+            "NE2 res 94  mol A": 2.191, 
+            "NE2 res 96  mol A": 2.026, 
+            "OE1 res 106  mol A": 3.959, 
+            "OG1 res 199  mol A": 3.979
+        }
+    ]
+}
