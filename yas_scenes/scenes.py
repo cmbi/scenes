@@ -47,6 +47,8 @@ def prepare_yasara(pid, yasara_log=None, n_threads=1):
     yas.Processors(cputhreads=n_threads)
 
 
+# TODO HideArrowAll, ShowArrow(Start="AtAtom", startatom, End="AtAtom", endatom,
+#                              Radius=0.1, Heads=0, Color="grey")
 def create_ion_scene(pdb_path, sce_path, ion_sites):
     """Create a YASARA scene displaying ion sites.
 
@@ -61,7 +63,7 @@ def create_ion_scene(pdb_path, sce_path, ion_sites):
             <ResNumber> (<ResNumber> ...) mol <MolName> e.g.
             '190 193 225 227 mol B'
 
-        It is import the numbering of the ions and ligands is PDB numbering
+        It is important the numbering of the ions and ligands is PDB numbering
         (and not WHAT IF or other numbering).
 
     Only the ion sites (ion + ligands) wil be shown, all other atoms are
