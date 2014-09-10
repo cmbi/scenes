@@ -12,7 +12,7 @@ RE_YASARA_EXIT = re.compile("^Connection to YASARA broken. Either you exited "
                             "YASARA manually or it encountered a fatal error$")
 
 
-def prepare_yasara(pid, yasara_log=None, n_cpu=1):
+def prepare_yasara(pid, yasara_log=None, n_threads=1):
     """Prepare YASARA for a parallel setting.
 
     This means: enable text mode, disable the license screen, assign a unique
@@ -42,9 +42,9 @@ def prepare_yasara(pid, yasara_log=None, n_cpu=1):
         _log.debug("Disabling YASARA console...")
         yas.Console("off")
 
-    # Use 1 cpu
-    _log.debug("Assigning {} cpu's to YASARA...".format(n_cpu))
-    yas.Processors(number=n_cpu)
+    # Use 1 cpu thread
+    _log.debug("Assigning {} cpu threads to YASARA...".format(n_threads))
+    yas.Processors(cputhreads=n_threads)
 
 
 def create_ion_scene(pdb_path, sce_path, ion_sites):
