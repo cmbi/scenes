@@ -1,3 +1,8 @@
+# 1.1.0 (11-09-2014)
+
+	* Improved ion site parsing
+	* Improved YASARA selection of ions (#5)
+
 # 1.0.0 (10-09-2014)
 
 	* Initial release
