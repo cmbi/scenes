@@ -1,7 +1,7 @@
 {
   "YASARA_DIR": "/home/wtouw/bin/yasara",
-  "PDB_SCENES_ROOT" : "pdb",
-  "REDO_SCENES_ROOT" : "redo",
+  "PDB_SCENES_ROOT" : "scenes",
+  "REDO_SCENES_ROOT" : "scenes",
   "SCENES_NAME" : {
     "ss2": ["sym-contacts", "ss2"],
     "iod": ["ion-sites", "iod"]

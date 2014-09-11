@@ -27,7 +27,7 @@ RE_ION = re.compile("""
                     (?P<res_ic>[A-Z ])\)          # Residue insertion code PDB
                     (?P<chain>\w)                 # Chain
                     \s+
-                    (?P<atom>[A-Z][A-Z \d]{2})    # Atom name
+                    (?P<atom>[A-Z][A-Z \d']{2,3}) # Atom name
                     \s-\s+
                     (?P<ion_num>\s*\d+)           # Sequential WHAT IF number
                     [ ]                           #
@@ -36,7 +36,7 @@ RE_ION = re.compile("""
                     (?P<ion_ic>[A-Z ])\)          # Residue insertion code PDB
                     (?P<ion_chain>\w)             # Chain
                     \s+
-                    (?P<ion>[A-Z]{2})             # Ion type
+                    (?P<ion>[A-Z][A-Z\d ]+)       # Ion atom name
                     \s+
                     (?P<dist>\d\.\d{3})           # Atom-ion distance
                     \s*$
@@ -50,7 +50,7 @@ def check_ss2_line_regex(l):
     """
     m = re.match(RE_SYMM, l)
     if not m:
-        raise ValueError('Unexpected ss2 file format: {}'.format(l))
+        raise ValueError("Unexpected ss2 file format: '{}'".format(l))
 
 
 def check_iod_line_regex(l):
@@ -60,7 +60,7 @@ def check_iod_line_regex(l):
     """
     m = re.match(RE_ION, l)
     if not m:
-        raise ValueError('Unexpected iod file format: {}'.format(l))
+        raise ValueError("Unexpected iod file format: '{}'".format(l))
 
 
 def int_check_ss2(seq_num, res_num, num_contacts):
@@ -174,13 +174,13 @@ def parse_iod_line(l):
     res_num = l[11:15]       # Residue number PDB
     res_ic = l[15:16]        # Residue insertion code PDB
     chain = l[17:18]         # Chain PDB
-    atom = l[25:28]          # Atom name
+    atom = l[24:28]          # Atom name
     atom = atom.strip()
     ion_num = l[31:36]       # Sequential WHAT IF numbering
     ion_pnum = l[42:46]      # Residue number PDB
     ion_ic = l[46:47]        # Residue insertion code PDB
     ion_chain = l[48:49]     # Chain PDB
-    ion = l[55:57]           # Ion type
+    ion = l[55:57]           # Ion atom name
     ion = ion.strip()
     dist = l[64:69]          # Ligand atom-ion distance
 

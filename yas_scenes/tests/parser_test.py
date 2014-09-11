@@ -35,7 +35,7 @@ def test_check_iod_line_regex_nomatch_1():
 def test_check_iod_line_regex_nomatch_2():
     """Test proper positioning of ss2 vars."""
     line = '   93 HIS (  94 )A       NE2 -   262  ZN ( 262 )A      ' +\
-           'Z        2.191'
+           '1ION     2.191'
     check_iod_line_regex(line)
 
 
@@ -55,9 +55,57 @@ def test_check_iod_line_regex_ok():
     result = check_iod_line_regex(line)
     eq_(result, None)
 
-    # HG
+    # Hg
     line = '  136 PRO ( 138 )A       N   -   263  HG ( 495 )A      ' +\
            'HG       4.063'
+    result = check_iod_line_regex(line)
+    eq_(result, None)
+
+    # Na
+    line = "  251 SAM ( 501 )A       O3' -   259  NA ( 820 )A      " +\
+           "NA       4.221"
+    result = check_iod_line_regex(line)
+    eq_(result, None)
+
+    # K
+    line = '  307 ASN ( 309 )A       O   -   832 K   (1419 )A      ' +\
+           ' K       2.757'
+    result = check_iod_line_regex(line)
+    eq_(result, None)
+
+    # CA
+    line = '    6 CGU (   6 )L      OE11 -   594  CA ( 505 )L      ' +\
+           'CA       2.941'
+    result = check_iod_line_regex(line)
+    eq_(result, None)
+
+    # Mg
+    line = '  330 MSE ( 352 )A      SE   -  1844  MG ( 501 )A      ' +\
+           'MG       4.268'
+    result = check_iod_line_regex(line)
+    eq_(result, None)
+
+    # Mn+ 1svv
+    line = '   23 ASP (  37 )A       OD1 -   683 UNL ( 401 )A      ' +\
+           'MN1      2.430'
+    result = check_iod_line_regex(line)
+    eq_(result, None)
+
+    # Pt+
+    line = '   14 ARG (  14 )A       NH2 -   135 CPT ( 206 )A      ' +\
+           'PT1      2.727'
+    result = check_iod_line_regex(line)
+    eq_(result, None)
+
+    # Rh+ 4gjv
+    line = '  115 HIS ( 127 )A       NE2 -   126  RH ( 403 )A      ' +\
+           'RH1      2.269'
+    result = check_iod_line_regex(line)
+    eq_(result, None)
+
+    # UNL 3tv2
+    line = '  135 SER ( 279 )A       OG  -   459 UNL ( 604 )A      ' +\
+           ' UNL     3.410'
     result = check_iod_line_regex(line)
     eq_(result, None)
 
@@ -128,6 +176,38 @@ def test_parse_iod_line_ok():
     eq_('138  mol A', residue)
     eq_('N res 138  mol A', atom)
     eq_(4.063, dist)
+
+    line = "  251 SAM ( 501 )A       O3' -   259  NA ( 820 )A      " +\
+           "NA       4.221"
+    ion, residue, atom, dist = parse_iod_line(line)
+    eq_('NA res 820  mol A', ion)
+    eq_('501  mol A', residue)
+    eq_("O3' res 501  mol A", atom)
+    eq_(4.221, dist)
+
+    line = '  307 ASN ( 309 )A       O   -   832 K   (1419 )A       ' +\
+           'K       2.757'
+    ion, residue, atom, dist = parse_iod_line(line)
+    eq_('K res 1419  mol A', ion)
+    eq_('309  mol A', residue)
+    eq_('O res 309  mol A', atom)
+    eq_(2.757, dist)
+
+    line = '    6 CGU (   6 )L      OE11 -   594  CA ( 505 )L      ' +\
+           'CA       2.941'
+    ion, residue, atom, dist = parse_iod_line(line)
+    eq_('CA res 505  mol L', ion)
+    eq_('6  mol L', residue)
+    eq_('OE11 res 6  mol L', atom)
+    eq_(2.941, dist)
+
+    line = '  330 MSE ( 352 )A      SE   -  1844  MG ( 501 )A      ' +\
+           'MG       4.268'
+    ion, residue, atom, dist = parse_iod_line(line)
+    eq_('MG res 501  mol A', ion)
+    eq_('352  mol A', residue)
+    eq_('SE res 352  mol A', atom)
+    eq_(4.268, dist)
 
 
 @raises(IOError)
