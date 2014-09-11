@@ -27,7 +27,7 @@ RE_ION = re.compile("""
                     (?P<res_ic>[A-Z ])\)          # Residue insertion code PDB
                     (?P<chain>\w)                 # Chain
                     \s+
-                    (?P<atom>[A-Z][A-Z \d]{2})    # Atom name
+                    (?P<atom>[A-Z][A-Z \d']{2,3}) # Atom name
                     \s-\s+
                     (?P<ion_num>\s*\d+)           # Sequential WHAT IF number
                     [ ]                           #
@@ -36,7 +36,7 @@ RE_ION = re.compile("""
                     (?P<ion_ic>[A-Z ])\)          # Residue insertion code PDB
                     (?P<ion_chain>\w)             # Chain
                     \s+
-                    (?P<ion>[A-Z]{2})             # Ion type
+                    (?P<ion>[A-Z][A-Z\d ]+)       # Ion atom name
                     \s+
                     (?P<dist>\d\.\d{3})           # Atom-ion distance
                     \s*$
@@ -50,7 +50,7 @@ def check_ss2_line_regex(l):
     """
     m = re.match(RE_SYMM, l)
     if not m:
-        raise ValueError('Unexpected ss2 file format: {}'.format(l))
+        raise ValueError("Unexpected ss2 file format: '{}'".format(l))
 
 
 def check_iod_line_regex(l):
@@ -60,7 +60,7 @@ def check_iod_line_regex(l):
     """
     m = re.match(RE_ION, l)
     if not m:
-        raise ValueError('Unexpected iod file format: {}'.format(l))
+        raise ValueError("Unexpected iod file format: '{}'".format(l))
 
 
 def int_check_ss2(seq_num, res_num, num_contacts):
@@ -131,6 +131,7 @@ def parse_ss2_line(l):
     # res_typ = l[6:10]      # Reside letters WI, 4 for [DR]NA, 3 for protein
     res_num = l[11:15]       # Residue number PDB
     res_ic = l[15:16]        # Residue insertion code PDB
+    res_ic = res_ic.strip()
     chain = l[17:18]         # Chain PDB
     num_contacts = l[18:33]  # Number of symmetry contacts for this residue
 
@@ -150,10 +151,11 @@ def parse_ss2_line(l):
 def parse_iod_line(l):
     """Extract ion, residue, and atom selections plus distance from iod line.
 
-    Return YASARA selection strings for ion, residue, and atom; plus distance.
+    Return YASARA selection strings for ion, residue, and atom;
+        plus the PDB name of the ion and distance between ion and ligand atom.
     The YASARA selection string for the ion is composed as:
-        <PDBAtomName> res <PDBResNumberWithInsertionCode> mol <MolName>
-        e.g. 'ZN res 262  mol A'
+        res <PDBResNumberWithInsertionCode> mol <MolName>
+        e.g. 'res 262  mol A'
 
     The YASARA selection string for the residue is composed as:
         <PDBResNumberWithInsertionCode> mol <MolName>
@@ -173,14 +175,16 @@ def parse_iod_line(l):
     seq_num = l[0:5]         # Sequential WHAT IF numbering
     res_num = l[11:15]       # Residue number PDB
     res_ic = l[15:16]        # Residue insertion code PDB
+    res_ic = res_ic.strip()
     chain = l[17:18]         # Chain PDB
-    atom = l[25:28]          # Atom name
+    atom = l[24:28]          # Atom name
     atom = atom.strip()
     ion_num = l[31:36]       # Sequential WHAT IF numbering
     ion_pnum = l[42:46]      # Residue number PDB
     ion_ic = l[46:47]        # Residue insertion code PDB
+    ion_ic = ion_ic.strip()
     ion_chain = l[48:49]     # Chain PDB
-    ion = l[55:57]           # Ion type
+    ion = l[55:57]           # Ion atom name
     ion = ion.strip()
     dist = l[64:69]          # Ligand atom-ion distance
 
@@ -189,20 +193,19 @@ def parse_iod_line(l):
 
     # Oversimplified format check
     seq_num, res_num, ion_num, ion_pnum, dist = int_check_iod(seq_num, res_num,
-                                                              ion_num, ion_pnum,
+                                                              ion_num,
+                                                              ion_pnum,
                                                               dist)
 
-    yasara_ion_selection = '{0:s} res {1:d}{2:s} mol {3:s}'.format(ion,
-                                                                   ion_pnum,
-                                                                   ion_ic,
-                                                                   ion_chain)
+    yasara_ion_selection = 'res {0:d}{1:s} mol {2:s}'.format(ion_pnum, ion_ic,
+                                                             ion_chain)
     yasara_residue_selection = '{0:d}{1:s} mol {2:s}'.format(res_num, res_ic,
                                                              chain)
     yasara_atom_selection = '{0:s} res {1:d}{2:s} mol {3:s}'.format(atom,
                                                                     res_num,
                                                                     res_ic,
                                                                     chain)
-    return yasara_ion_selection, yasara_residue_selection, \
+    return yasara_ion_selection, ion, yasara_residue_selection, \
         yasara_atom_selection, dist
 
 
@@ -239,24 +242,28 @@ def parse_ion_sites(iod):
     """Parse ion sites from an iod.bz2 file.
 
     Return a dict:
-        The keys are YASARA ion selection strings:
-            <PDBAtomName> res <PDBResNumberWithInsertionCode> mol <MolName>
-            e.g. 'ZN res 262 mol A'
+
+        The keys are YASARA residue selection strings for the ion (its in its
+        own residue):
+            res <PDBResNumberWithInsertionCode> mol <MolName>
+            e.g. 'res 262 mol A'
         The values are lists:
-            The first element is a list of YASARA selection strings
+            The first element is the PDB atom name e.g. 'ZN'
+
+            The second element is a list of YASARA selection strings
             of residues bound to the ion.
             <PDBResNumberWithInsertionCode> mol <MolName>
             e.g. ['94  mol A', '96  mol A', '106  mol A', '119  mol A']
 
-            The second element is a dict
+            The third element is a dict
             The keys are YASARA atom selection strings (as above)
             The values are distances defined by the atom to the ion.
 
-    {'<PDBAtomName> res <ResNumberWithInsertionCode> mol <MolName>':
-        [
-            [<PDBResNumberWithInsertionCode> mol <MolName>, ]
-            {<PDBAtomName> res <ResNumberWithInsertionCode> mol <MolName>:
-             distance}]}
+        {'res <ResNumberWithInsertionCode> mol <MolName>':
+            ['<PDBAtomName>',
+             [<PDBResNumberWithInsertionCode> mol <MolName>, ],
+             {<PDBAtomName> res <ResNumberWithInsertionCode> mol <MolName>:
+             distance}]},
 
     Residue insertion codes are included in the residue number.
 
@@ -269,12 +276,12 @@ def parse_ion_sites(iod):
             for line in f:
                 if not line.startswith('*END'):
                     line = line.rstrip()
-                    ion, residue, atom, dist = parse_iod_line(line)
+                    ion, ion_name, residue, atom, dist = parse_iod_line(line)
                     if ion not in ion_sites:
-                        ion_sites[ion] = [[residue], {atom: dist}]
+                        ion_sites[ion] = [ion_name, [residue], {atom: dist}]
                     else:
-                        ion_sites[ion][0].append(residue)
-                        ion_sites[ion][1][atom] = dist
+                        ion_sites[ion][1].append(residue)
+                        ion_sites[ion][2][atom] = dist
 
     except IOError as e:
         _log.error(e)
