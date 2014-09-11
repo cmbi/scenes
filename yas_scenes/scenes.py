@@ -53,24 +53,30 @@ def create_ion_scene(pdb_path, sce_path, ion_sites):
     pdb_path is the path to the PDB file
     sce_path is the path of the YASARA scene to be created
     ion_sites is a dictionary of the ion sites to display.
-        The keys are YASARA ion selection strings:
-            <PDBAtomName> res <PDBResNumberWithInsertionCode> mol <MolName>
-            e.g. 'ZN res 262 mol A'
+        The keys are YASARA residue selection strings for the ion (its in its
+        own residue):
+            res <PDBResNumberWithInsertionCode> mol <MolName>
+            e.g. 'res 262 mol A'
         The values are lists:
-            The first element is a list of YASARA selection strings
+            The first element is the PDB atom name e.g. 'ZN'
+
+            The second element is a list of YASARA selection strings
             of residues bound to the ion.
             <PDBResNumberWithInsertionCode> mol <MolName>
             e.g. ['94  mol A', '96  mol A', '106  mol A', '119  mol A']
 
-            The second element is a dict
+            The third element is a dict
             The keys are YASARA atom selection strings (as above)
             The values are distances defined by the atom to the ion.
 
-    {'<PDBAtomName> res <ResNumberWithInsertionCode> mol <MolName>':
-        [
-            [<PDBResNumberWithInsertionCode> mol <MolName>, ]
-            {<PDBAtomName> res <ResNumberWithInsertionCode> mol <MolName>:
-             distance}]}
+        {'res <ResNumberWithInsertionCode> mol <MolName>':
+            ['<PDBAtomName>',
+             [<PDBResNumberWithInsertionCode> mol <MolName>, ],
+             {<PDBAtomName> res <ResNumberWithInsertionCode> mol <MolName>:
+             distance}]},
+
+
+
 
     Residue insertion codes are included in the residue number.
 
@@ -98,14 +104,12 @@ def create_ion_scene(pdb_path, sce_path, ion_sites):
     # Then show the ion sites
     for ion, values in ion_sites.iteritems():
         # ions..
-        # Instead of dealing with capitalized letters
-        # we ask YASARA for the atom
-        ion_at = yas.ListRes(ion)
-        yas.ShowAtom(ion_at)
-        yas.BallAtom(ion_at)
+        # always have their own residue
+        yas.ShowAtom(ion)
+        yas.BallAtom(ion)
 
         # ..and ligands
-        ligands = values[0]
+        ligands = values[1]
         for ligand in ligands:
             yas.ShowRes(ligand)
             yas.StickRes(ligand)
@@ -117,9 +121,10 @@ def create_ion_scene(pdb_path, sce_path, ion_sites):
 
     # Zoom in on first site
     ion1 = ion_sites.iterkeys().next()
-    atom = yas.ListRes(ion1)
-    yas.CenterAtom(atom[0], coordsys="Global")
-    yas.ZoomAtom(atom[0], steps=0)
+    # Deal with alternates
+    alt1 = yas.ListRes(ion1, format="ATOMNUM")
+    yas.CenterAtom(alt1, coordsys="Global")
+    yas.ZoomAtom(alt1, steps=0)
 
     # Save scene
     _log.debug("Saving YASARA scene to file {}".format(sce_path))

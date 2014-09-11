@@ -60,8 +60,5 @@ Session.vim
 *~
 
 # scenes
-sce/
-logs/
+scenes/
 scripts/*.sh
-pdb/
-reod/
