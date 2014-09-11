@@ -91,7 +91,7 @@ def test_check_iod_line_regex_ok():
     result = check_iod_line_regex(line)
     eq_(result, None)
 
-    # Pt+
+    # Pt+ 4g49
     line = '   14 ARG (  14 )A       NH2 -   135 CPT ( 206 )A      ' +\
            'PT1      2.727'
     result = check_iod_line_regex(line)
@@ -163,50 +163,56 @@ def test_parse_iod_line_ok():
 
     line = '   93 HIS (  94 )A       NE2 -   262  ZN ( 262 )A      ' +\
            'ZN       2.191'
-    ion, residue, atom, dist = parse_iod_line(line)
-    eq_('ZN res 262  mol A', ion)
-    eq_('94  mol A', residue)
-    eq_('NE2 res 94  mol A', atom)
+    ion, ion_name, residue, atom, dist = parse_iod_line(line)
+    eq_('res 262 mol A', ion)
+    eq_('ZN', ion_name)
+    eq_('94 mol A', residue)
+    eq_('NE2 res 94 mol A', atom)
     eq_(2.191, dist)
 
     line = '  136 PRO ( 138 )A       N   -   263  HG ( 495 )A      ' +\
            'HG       4.063'
-    ion, residue, atom, dist = parse_iod_line(line)
-    eq_('HG res 495  mol A', ion)
-    eq_('138  mol A', residue)
-    eq_('N res 138  mol A', atom)
+    ion, ion_name, residue, atom, dist = parse_iod_line(line)
+    eq_('res 495 mol A', ion)
+    eq_('HG', ion_name)
+    eq_('138 mol A', residue)
+    eq_('N res 138 mol A', atom)
     eq_(4.063, dist)
 
     line = "  251 SAM ( 501 )A       O3' -   259  NA ( 820 )A      " +\
            "NA       4.221"
-    ion, residue, atom, dist = parse_iod_line(line)
-    eq_('NA res 820  mol A', ion)
-    eq_('501  mol A', residue)
-    eq_("O3' res 501  mol A", atom)
+    ion, ion_name, residue, atom, dist = parse_iod_line(line)
+    eq_('res 820 mol A', ion)
+    eq_('NA', ion_name)
+    eq_('501 mol A', residue)
+    eq_("O3' res 501 mol A", atom)
     eq_(4.221, dist)
 
     line = '  307 ASN ( 309 )A       O   -   832 K   (1419 )A       ' +\
            'K       2.757'
-    ion, residue, atom, dist = parse_iod_line(line)
-    eq_('K res 1419  mol A', ion)
-    eq_('309  mol A', residue)
-    eq_('O res 309  mol A', atom)
+    ion, ion_name, residue, atom, dist = parse_iod_line(line)
+    eq_('res 1419 mol A', ion)
+    eq_('K', ion_name)
+    eq_('309 mol A', residue)
+    eq_('O res 309 mol A', atom)
     eq_(2.757, dist)
 
     line = '    6 CGU (   6 )L      OE11 -   594  CA ( 505 )L      ' +\
            'CA       2.941'
-    ion, residue, atom, dist = parse_iod_line(line)
-    eq_('CA res 505  mol L', ion)
-    eq_('6  mol L', residue)
-    eq_('OE11 res 6  mol L', atom)
+    ion, ion_name, residue, atom, dist = parse_iod_line(line)
+    eq_('res 505 mol L', ion)
+    eq_('CA', ion_name)
+    eq_('6 mol L', residue)
+    eq_('OE11 res 6 mol L', atom)
     eq_(2.941, dist)
 
     line = '  330 MSE ( 352 )A      SE   -  1844  MG ( 501 )A      ' +\
            'MG       4.268'
-    ion, residue, atom, dist = parse_iod_line(line)
-    eq_('MG res 501  mol A', ion)
-    eq_('352  mol A', residue)
-    eq_('SE res 352  mol A', atom)
+    ion, ion_name, residue, atom, dist = parse_iod_line(line)
+    eq_('res 501 mol A', ion)
+    eq_('MG', ion_name)
+    eq_('352 mol A', residue)
+    eq_('SE res 352 mol A', atom)
     eq_(4.268, dist)
 
 
@@ -255,12 +261,13 @@ def test_parse_symm_contacts_1cra():
         ion = v
         result_ion = result[k]
         eq_(len(ion), len(result_ion))
-        eq_(len(ion[0]), len(result_ion[0]))
+        eq_(ion[0], result_ion[0])
         eq_(len(ion[1]), len(result_ion[1]))
-        for res in ion[0]:
-            assert res in result_ion[0]
-        for l, w in ion[1].iteritems():
-            eq_(w, result_ion[1][l])
+        eq_(len(ion[2]), len(result_ion[2]))
+        for res in ion[1]:
+            assert res in result_ion[1]
+        for l, w in ion[2].iteritems():
+            eq_(w, result_ion[2][l])
 
 
 @raises(TypeError)
@@ -402,7 +409,7 @@ def test_parse_ss2_line_ok():
     """Test that selection string and n_contacts are correctly returned."""
     line = '    1 MET (   1 )A              3       '
     selection, n_contacts = parse_ss2_line(line)
-    eq_('1  mol A', selection)
+    eq_('1 mol A', selection)
     eq_(3, n_contacts)
 
     line = '   35 SER (  40A)A              0       '
@@ -412,22 +419,22 @@ def test_parse_ss2_line_ok():
 
     line = '  160  CL ( 173 )A              2       '
     selection, n_contacts = parse_ss2_line(line)
-    eq_('173  mol A', selection)
+    eq_('173 mol A', selection)
     eq_(2, n_contacts)
 
     line = '    1 DTHY(4001 )A              4       '
     selection, n_contacts = parse_ss2_line(line)
-    eq_('4001  mol A', selection)
+    eq_('4001 mol A', selection)
     eq_(4, n_contacts)
 
     line = '  152 OADE(   5 )B             10       '
     selection, n_contacts = parse_ss2_line(line)
-    eq_('5  mol B', selection)
+    eq_('5 mol B', selection)
     eq_(10, n_contacts)
 
     line = '    1 GLY (  -1 )A              0       '
     selection, n_contacts = parse_ss2_line(line)
-    eq_('-1  mol A', selection)
+    eq_('-1 mol A', selection)
     eq_(0, n_contacts)
 
 

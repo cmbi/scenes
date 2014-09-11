@@ -49,7 +49,7 @@ def ion_sites(pdb_file_path, yasara_scene_path, ion_ligand_dict,
 
     if not has_expected_log_count_ions(num_lines, ion_ligand_dict):
         msg = 'Error creating YASARA scene:' \
-            ' some commands could not be executed'
+            ' some commands could not be executed correctly'
         return False, msg
 
     return success, msg
@@ -106,20 +106,18 @@ def has_expected_log_count_ions(found_log_lines, ion_ligand_dict):
     The expected number of logs is calculated as follows (pseudocode):
         +6 (newline, set CPU number, load PDB, set style, hide all (arrows))
         loop over all ions:
-            +6 for ListRes ion
             +2 for ion show, style
             loop over all residues:
                 +2 show, style
         +3 (color background, stick, ballstick)
-        +6 for ListRes ion
-        +4 (center, zoom, save, exit)
+        +10 (list alternate A, center, zoom, save, exit)
     """
     head = 6
     tail = 13
     rest = 0
     for l in ion_ligand_dict.itervalues():
-        rest = rest + 8
-        for ligres in l[0]:
+        rest = rest + 2
+        for ligres in l[1]:
             rest = rest + 2
     expected = head + rest + tail
 
