@@ -12,7 +12,7 @@ from yas_scenes.scenes import (create_ion_scene, create_sym_scene, exit_yasara,
 
 def ion_sites(pdb_file_path, yasara_scene_path, ion_ligand_dict,
               yasara_pid, yasara_log):
-    """Creates a YASARA scene displaying ion sites.
+    """Creates a YASARA scene displaying metal ion sites.
 
     Return a boolean indicating whether everything went succesful
     Return also a string reporting the most important reason why things went
@@ -57,7 +57,7 @@ def ion_sites(pdb_file_path, yasara_scene_path, ion_ligand_dict,
 
 def symmetry_contacts(pdb_file_path, yasara_scene_path, symmetry_contacts_dict,
                       yasara_pid, yasara_log):
-    """Creates a YASARA scene displaying symmetry contacts.
+    """Creates a YASARA scene displaying crystal contacts.
 
     Return a boolean indicating whether everything went succesful
     Return also a string reporting the most important reason why things went

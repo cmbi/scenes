@@ -84,7 +84,7 @@ def int_check_ss2(seq_num, res_num, num_contacts):
     try:
         num_contacts = int(num_contacts)
     except ValueError:
-        raise ValueError('Number of symmetry contacts should be integer')
+        raise ValueError('Number of crystal contacts should be integer')
 
     return seq_num, res_num, num_contacts
 
@@ -116,7 +116,7 @@ def int_check_iod(seq_num, res_num, ion_num, ion_pnum, dist):
 
 
 def parse_ss2_line(l):
-    """Extract residue identifier and number of symmetry contacts from ss2 line.
+    """Extract residue identifier and number of crystal contacts from ss2 line.
 
     Return YASARA selection string and number of contacts.
     The YASARA selection string is composed as:
@@ -216,10 +216,10 @@ def parse_iod_line(l):
 
 
 def parse_sym_contacts(ss2):
-    """Parse symmetry contacts from a ss2.bz2 file.
+    """Parse crystal contacts from a ss2.bz2 file.
 
     Return a dict of YASARA residue selection strings (keys) and number of
-    symmetry contacts (values):
+    crystal contacts (values):
         {'<ResNumberWithInsertionCode> mol <MolName>': 1}
     Residue insertion codes are included in the residue number.
 
@@ -245,7 +245,7 @@ def parse_sym_contacts(ss2):
 
 
 def parse_ion_sites(iod):
-    """Parse ion sites from an iod.bz2 file.
+    """Parse metal ion sites from an iod.bz2 file.
 
     Return a dict:
 

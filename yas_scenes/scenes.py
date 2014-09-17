@@ -48,7 +48,7 @@ def prepare_yasara(pid, yasara_log=None, n_threads=1):
 
 
 def create_ion_scene(pdb_path, sce_path, ion_sites):
-    """Create a YASARA scene displaying ion sites.
+    """Create a YASARA scene displaying metal ion sites.
 
     pdb_path is the path to the PDB file
     sce_path is the path of the YASARA scene to be created
@@ -132,7 +132,7 @@ def create_ion_scene(pdb_path, sce_path, ion_sites):
 
 
 def create_sym_scene(pdb_path, sce_path, sym_contacts):
-    """Create a YASARA scene displaying the symmetry contacts.
+    """Create a YASARA scene displaying the crystal contacts.
 
     pdb_path is the path to the PDB file
     sce_path is the path of the YASARA scene to be created
