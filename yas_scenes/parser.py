@@ -34,7 +34,9 @@ RE_ION = re.compile("""
                     (?P<ion_type>\s*\w[ \w]{0,3}) # Residue type WHAT IF
                     \((?P<ion_pnum>[\d -]{3}\d)   # Residue number PDB
                     (?P<ion_ic>[A-Z ])\)          # Residue insertion code PDB
-                    (?P<ion_chain>\w)             # Chain
+                    (?P<ion_chain>\w)             # Chain WHAT IF
+                    \s+
+                    (?P<ion_chain_pdb>[\w ])      # Chain PDB
                     \s+
                     (?P<ion>[A-Z][A-Z\d ]+)       # Ion atom name
                     \s+
@@ -175,18 +177,22 @@ def parse_iod_line(l):
     seq_num = l[0:5]         # Sequential WHAT IF numbering
     res_num = l[11:15]       # Residue number PDB
     res_ic = l[15:16]        # Residue insertion code PDB
-    res_ic = res_ic.strip()
     chain = l[17:18]         # Chain PDB
     atom = l[24:28]          # Atom name
     atom = atom.strip()
     ion_num = l[31:36]       # Sequential WHAT IF numbering
     ion_pnum = l[42:46]      # Residue number PDB
     ion_ic = l[46:47]        # Residue insertion code PDB
-    ion_ic = ion_ic.strip()
-    ion_chain = l[48:49]     # Chain PDB
+    ion_chain = l[48:49]     # Chain WHAT IF
+    ion_pchain = l[52:53]    # Chain PDB
     ion = l[55:57]           # Ion atom name
     ion = ion.strip()
     dist = l[64:69]          # Ligand atom-ion distance
+
+    # Process a bit
+    res_ic = res_ic.strip()
+    ion_ic = ion_ic.strip()
+    ion_chain = ion_pchain if ion_pchain != ' ' else ion_chain
 
     # Regex checks
     check_iod_line_regex(l)
