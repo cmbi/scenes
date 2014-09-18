@@ -97,16 +97,16 @@ def create_ion_scene(pdb_path, sce_path, ion_sites):
     _log.debug("Making YASARA ion scene...")
 
     # Hide everything at first
-    yas.Style(backbone="stick", sidechain="stick")
+    yas.Style(backbone="Stick", sidechain="Stick")
     yas.HideAll()
     yas.HideArrowAll()
 
     # Then show the ion sites
     for ion, values in ion_sites.iteritems():
-        # ions..
+        # metal ions..
         # always have their own residue
-        yas.ShowAtom(ion)
-        yas.BallAtom(ion)
+        yas.ShowAtom("{} and metal".format(ion))
+        yas.BallAtom("{} and metal".format(ion))
 
         # ..and ligands
         ligands = values[1]
@@ -122,7 +122,7 @@ def create_ion_scene(pdb_path, sce_path, ion_sites):
     # Zoom in on first site
     ion1 = ion_sites.iterkeys().next()
     # Deal with alternates
-    alt1 = yas.ListRes(ion1, format="ATOMNUM")
+    alt1 = yas.ListRes("{} and metal".format(ion1), format="ATOMNUM")
     yas.CenterAtom(alt1, coordsys="Global")
     yas.ZoomAtom(alt1, steps=0)
 
