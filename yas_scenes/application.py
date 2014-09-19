@@ -93,8 +93,8 @@ def main():
                         help="PDB file source")
     subparsers = parser.add_subparsers(title="mode",
                                        description="YASARA scene type",
-                                       help="ion for metal ion sites, symm for "
-                                            "crystal contacts")
+                                       help="ion for metal ion sites, symm for"
+                                            " crystal contacts")
     p_ion = subparsers.add_parser("ion", description="Create a YASARA scene of"
                                   " metal ion sites")
     p_ion.add_argument("iod", help="WHAT IF list iod file (bzip2ed)",

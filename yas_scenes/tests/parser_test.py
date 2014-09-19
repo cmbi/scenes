@@ -425,6 +425,11 @@ def test_check_ss2_line_regex_ok():
     result = check_ss2_line_regex(line)
     eq_(result, None)
 
+    # Ligand with corrected chain id
+    line = '  805 FAR (2010 )P   B          0       '
+    result = check_ss2_line_regex(line)
+    eq_(result, None)
+
 
 @raises(ValueError)
 def test_int_check_ss2_seq_num():
@@ -485,6 +490,11 @@ def test_parse_ss2_line_ok():
     line = '    1 GLY (  -1 )A              0       '
     selection, n_contacts = parse_ss2_line(line)
     eq_('-1 mol A', selection)
+    eq_(0, n_contacts)
+
+    line = '  805 FAR (2010 )P   B          0       '
+    selection, n_contacts = parse_ss2_line(line)
+    eq_('2010 mol B', selection)
     eq_(0, n_contacts)
 
 
