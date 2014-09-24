@@ -1,0 +1,54 @@
+{
+    "res 478 mol A": [
+        "MN", 
+        [
+            "97 mol A", 
+            "97 mol A", 
+            "326 mol A", 
+            "326 mol A"
+        ], 
+        {
+            "OD1 res 97 mol A": 3.494, 
+            "OD2 res 97 mol A": 2.181, 
+            "OE1 res 326 mol A": 2.452, 
+            "OE2 res 326 mol A": 2.08
+        }
+    ], 
+    "res 479 mol A": [
+        "MN", 
+        [
+            "97 mol A", 
+            "188 mol A", 
+            "188 mol A"
+        ], 
+        {
+            "OD1 res 188 mol A": 3.395, 
+            "OD1 res 97 mol A": 2.11, 
+            "OD2 res 188 mol A": 2.15
+        }
+    ], 
+    "res 480 mol A": [
+        "MG", 
+        [
+            "178 mol A", 
+            "181 mol A"
+        ], 
+        {
+            "O res 178 mol A": 2.543, 
+            "OG res 181 mol A": 2.559
+        }
+    ], 
+    "res 481 mol A": [
+        "MG", 
+        [
+            "451 mol A", 
+            "451 mol A", 
+            "454 mol A"
+        ], 
+        {
+            "OE1 res 451 mol A": 2.133, 
+            "OE1 res 454 mol A": 2.261, 
+            "OE2 res 451 mol A": 3.34
+        }
+    ]
+}

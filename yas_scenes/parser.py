@@ -12,7 +12,10 @@ RE_SYMM = re.compile("""
                      (?P<res_type>\s*\w[ \w]{0,3}) # Residue type WHAT IF
                      \((?P<res_num>[\d -]{3}\d)    # Residue number PDB
                      (?P<res_ic>[A-Z ])\)          # Residue insertion code PDB
-                     (?P<chain>\w)                 # Chain
+                     (?P<chain>\w)                 # Chain WHAT IF
+                     \s+
+                     (?P<chain_pdb>[\w ])          # Chain PDB
+                     \s+
                      (?P<num_contacts>\s+\d+)      # Number of contacts
                      \s*$
                      """, re.VERBOSE)
@@ -34,7 +37,9 @@ RE_ION = re.compile("""
                     (?P<ion_type>\s*\w[ \w]{0,3}) # Residue type WHAT IF
                     \((?P<ion_pnum>[\d -]{3}\d)   # Residue number PDB
                     (?P<ion_ic>[A-Z ])\)          # Residue insertion code PDB
-                    (?P<ion_chain>\w)             # Chain
+                    (?P<ion_chain>\w)             # Chain WHAT IF
+                    \s+
+                    (?P<ion_chain_pdb>[\w ])      # Chain PDB
                     \s+
                     (?P<ion>[A-Z][A-Z\d ]+)       # Ion atom name
                     \s+
@@ -82,7 +87,7 @@ def int_check_ss2(seq_num, res_num, num_contacts):
     try:
         num_contacts = int(num_contacts)
     except ValueError:
-        raise ValueError('Number of symmetry contacts should be integer')
+        raise ValueError('Number of crystal contacts should be integer')
 
     return seq_num, res_num, num_contacts
 
@@ -114,7 +119,7 @@ def int_check_iod(seq_num, res_num, ion_num, ion_pnum, dist):
 
 
 def parse_ss2_line(l):
-    """Extract residue identifier and number of symmetry contacts from ss2 line.
+    """Extract residue identifier and number of crystal contacts from ss2 line.
 
     Return YASARA selection string and number of contacts.
     The YASARA selection string is composed as:
@@ -131,9 +136,13 @@ def parse_ss2_line(l):
     # res_typ = l[6:10]      # Reside letters WI, 4 for [DR]NA, 3 for protein
     res_num = l[11:15]       # Residue number PDB
     res_ic = l[15:16]        # Residue insertion code PDB
+    chain = l[17:18]         # Chain WHAT IF
+    chain_pdb = l[21:22]     # Chain PDB
+    num_contacts = l[25:33]  # Number of symmetry contacts for this residue
+
+    # Process a bit
     res_ic = res_ic.strip()
-    chain = l[17:18]         # Chain PDB
-    num_contacts = l[18:33]  # Number of symmetry contacts for this residue
+    chain = chain_pdb if chain_pdb != ' ' else chain
 
     # Regex checks
     check_ss2_line_regex(l)
@@ -175,18 +184,22 @@ def parse_iod_line(l):
     seq_num = l[0:5]         # Sequential WHAT IF numbering
     res_num = l[11:15]       # Residue number PDB
     res_ic = l[15:16]        # Residue insertion code PDB
-    res_ic = res_ic.strip()
     chain = l[17:18]         # Chain PDB
     atom = l[24:28]          # Atom name
-    atom = atom.strip()
     ion_num = l[31:36]       # Sequential WHAT IF numbering
     ion_pnum = l[42:46]      # Residue number PDB
     ion_ic = l[46:47]        # Residue insertion code PDB
-    ion_ic = ion_ic.strip()
-    ion_chain = l[48:49]     # Chain PDB
+    ion_chain = l[48:49]     # Chain WHAT IF
+    ion_pchain = l[52:53]    # Chain PDB
     ion = l[55:57]           # Ion atom name
-    ion = ion.strip()
     dist = l[64:69]          # Ligand atom-ion distance
+
+    # Process a bit
+    res_ic = res_ic.strip()
+    atom = atom.strip()
+    ion_ic = ion_ic.strip()
+    ion = ion.strip()
+    ion_chain = ion_pchain if ion_pchain != ' ' else ion_chain
 
     # Regex checks
     check_iod_line_regex(l)
@@ -210,10 +223,10 @@ def parse_iod_line(l):
 
 
 def parse_sym_contacts(ss2):
-    """Parse symmetry contacts from a ss2.bz2 file.
+    """Parse crystal contacts from a ss2.bz2 file.
 
     Return a dict of YASARA residue selection strings (keys) and number of
-    symmetry contacts (values):
+    crystal contacts (values):
         {'<ResNumberWithInsertionCode> mol <MolName>': 1}
     Residue insertion codes are included in the residue number.
 
@@ -239,7 +252,7 @@ def parse_sym_contacts(ss2):
 
 
 def parse_ion_sites(iod):
-    """Parse ion sites from an iod.bz2 file.
+    """Parse metal ion sites from an iod.bz2 file.
 
     Return a dict:
 

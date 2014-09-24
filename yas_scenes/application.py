@@ -10,7 +10,7 @@ from yas_scenes.utils import (delete_scene, is_valid_file, is_valid_pdbid,
 
 
 def ion(args):
-    """Create ion site YASARA scene
+    """Create metal ion site YASARA scene
 
     This function wil create in SCENES_ROOT/iod/pdbid
     - either a YASARA scene or a WHY_NOT file
@@ -26,7 +26,7 @@ def ion(args):
     scene_path, yas_log_path, wn_file, wn_db = set_dir_log_wn(args, 'iod')
     ion_ligands = parse_ion_sites(iod=args.iod)
 
-    _log.info('Will try to create ion sites YASARA scene {} from {} '
+    _log.info('Will try to create metal ion sites YASARA scene {} from {} '
               'and {} for PDB ID {}'.format(scene_path, args.pdb_file_path,
                                             args.iod, args.pdb_id))
     success, msg = ion_sites(args.pdb_file_path, scene_path,
@@ -43,7 +43,7 @@ def ion(args):
 
 
 def ss2(args):
-    """Create symmetry contacts YASARA scene
+    """Create crystal contacts YASARA scene
 
     This function wil create in SCENES_ROOT/ss2/pdbid
     - either a YASARA scene or a WHY_NOT file
@@ -59,7 +59,7 @@ def ss2(args):
     scene_path, yas_log_path, wn_file, wn_db = set_dir_log_wn(args, 'ss2')
     sym_contacts = parse_sym_contacts(ss2=args.ss2)
 
-    _log.info('Will try to create symmetry contacts YASARA scene {} from {} '
+    _log.info('Will try to create crystal contacts YASARA scene {} from {} '
               'and {} for PDB ID {}'.format(scene_path, args.pdb_file_path,
                                             args.ss2, args.pdb_id))
     success, msg = symmetry_contacts(args.pdb_file_path, scene_path,
@@ -93,16 +93,16 @@ def main():
                         help="PDB file source")
     subparsers = parser.add_subparsers(title="mode",
                                        description="YASARA scene type",
-                                       help="ion for ion sites, symm for "
-                                            "symmetry contacts")
+                                       help="ion for metal ion sites, symm for"
+                                            " crystal contacts")
     p_ion = subparsers.add_parser("ion", description="Create a YASARA scene of"
-                                  " ion sites")
+                                  " metal ion sites")
     p_ion.add_argument("iod", help="WHAT IF list iod file (bzip2ed)",
                        type=lambda x: is_valid_file(parser, x))
     p_ion.set_defaults(func=ion)
     p_ss2 = subparsers.add_parser("symm", description="Create a YASARA scene"
-                                  " with colored symmetry contacts")
-    p_ss2.add_argument("ss2", help="WHAT IF list symmetry contacts file "
+                                  " with colored crystal contacts")
+    p_ss2.add_argument("ss2", help="WHAT IF list crystal contacts file "
                                    "(bzip2ed), e.g. 1crn.ss2.bz2",
                        type=lambda x: is_valid_file(parser, x))
     p_ss2.set_defaults(func=ss2)

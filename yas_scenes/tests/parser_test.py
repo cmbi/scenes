@@ -67,6 +67,11 @@ def test_check_iod_line_regex_ok():
     result = check_iod_line_regex(line)
     eq_(result, None)
 
+    line = ' 4677 SER (  17 )L       O   -  6845  NA (8378 )L   0  ' +\
+           'NA       4.096'
+    result = check_iod_line_regex(line)
+    eq_(result, None)
+
     # K
     line = '  307 ASN ( 309 )A       O   -   832 K   (1419 )A      ' +\
            ' K       2.757'
@@ -82,6 +87,12 @@ def test_check_iod_line_regex_ok():
     # Mg
     line = '  330 MSE ( 352 )A      SE   -  1844  MG ( 501 )A      ' +\
            'MG       4.268'
+    result = check_iod_line_regex(line)
+    eq_(result, None)
+
+    # Mn 1mus
+    line = '  134 ASP (  97 )A       OD1 -   500  MN ( 478 )B   A  ' +\
+           'MN       3.494'
     result = check_iod_line_regex(line)
     eq_(result, None)
 
@@ -215,6 +226,15 @@ def test_parse_iod_line_ok():
     eq_('SE res 352 mol A', atom)
     eq_(4.268, dist)
 
+    line = '  363 GLU ( 326 )A       OE2 -   500  MN ( 478 )B   A  ' +\
+           'MN       2.080'
+    ion, ion_name, residue, atom, dist = parse_iod_line(line)
+    eq_('res 478 mol A', ion)
+    eq_('MN', ion_name)
+    eq_('326 mol A', residue)
+    eq_('OE2 res 326 mol A', atom)
+    eq_(2.080, dist)
+
 
 @raises(IOError)
 def test_parse_ion_sites_ioerr_file_not_found():
@@ -242,7 +262,7 @@ def test_parse_ion_sites_valerr():
                                  '1cra_valerr.iod.bz2'))
 
 
-def test_parse_symm_contacts_1cra():
+def test_parse_ion_sites_1cra():
     """Test that 1cra.iod.bz2 is parsed correctly.
 
     1cra contains protein, ZN and HG
@@ -256,6 +276,36 @@ def test_parse_symm_contacts_1cra():
 
     result = parse_ion_sites(os.path.join('yas_scenes', 'tests', 'files',
                                           '1cra.iod.bz2'))
+
+    eq_(len(ion_sites), len(result))
+    for k, v in ion_sites.iteritems():
+        ion = v
+        result_ion = result[k]
+        eq_(len(ion), len(result_ion))
+        eq_(ion[0], result_ion[0])
+        eq_(len(ion[1]), len(result_ion[1]))
+        eq_(len(ion[2]), len(result_ion[2]))
+        for res in ion[1]:
+            assert res in result_ion[1]
+        for l, w in ion[2].iteritems():
+            eq_(w, result_ion[2][l])
+
+
+def test_parse_ion_sites_1mus():
+    """Test that 1mus.iod.bz2 is parsed correctly.
+
+    1mus contains protein, DNA, Mg and Mn
+    """
+    try:
+        with open(os.path.join('yas_scenes', 'tests', 'files',
+                               '1mus.iod.json'), 'r') as f:
+            ion_sites = json.load(f)
+    except IOError as e:
+        raise e
+
+    result = parse_ion_sites(os.path.join('yas_scenes', 'tests', 'files',
+                                          '1mus.iod.bz2'))
+
     eq_(len(ion_sites), len(result))
     for k, v in ion_sites.iteritems():
         ion = v
@@ -375,6 +425,11 @@ def test_check_ss2_line_regex_ok():
     result = check_ss2_line_regex(line)
     eq_(result, None)
 
+    # Ligand with corrected chain id
+    line = '  805 FAR (2010 )P   B          0       '
+    result = check_ss2_line_regex(line)
+    eq_(result, None)
+
 
 @raises(ValueError)
 def test_int_check_ss2_seq_num():
@@ -435,6 +490,11 @@ def test_parse_ss2_line_ok():
     line = '    1 GLY (  -1 )A              0       '
     selection, n_contacts = parse_ss2_line(line)
     eq_('-1 mol A', selection)
+    eq_(0, n_contacts)
+
+    line = '  805 FAR (2010 )P   B          0       '
+    selection, n_contacts = parse_ss2_line(line)
+    eq_('2010 mol B', selection)
     eq_(0, n_contacts)
 
 
