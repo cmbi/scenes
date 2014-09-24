@@ -1,3 +1,9 @@
+# 1.1.5 (24-09-2014)
+
+	* Improved ion site iod list parsing
+	* Improved crystal contact ss2 list parsing
+	* Improved YASARA selection of ions
+
 # 1.1.0 (11-09-2014)
 
 	* Improved ion site parsing
