@@ -1,3 +1,8 @@
+# 1.1.6 (06-10-2014)
+
+	* Parse warnings from YASARA log
+	* Improved YASARA selection of ions
+
 # 1.1.5 (24-09-2014)
 
 	* Improved ion site iod list parsing
