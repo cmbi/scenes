@@ -47,6 +47,10 @@ def ion_sites(pdb_file_path, yasara_scene_path, ion_ligand_dict,
         msg = 'Error terminating YASARA: no Exit statement in YASARA log'
         return False, msg
 
+    warned, warning, warn_count = has_logged_warning(yasara_log)
+    if warned:
+        num_lines = num_lines - warn_count
+
     if not has_expected_log_count_ions(num_lines, ion_ligand_dict):
         msg = 'Error creating YASARA scene:' \
             ' some commands could not be executed correctly'
@@ -91,6 +95,11 @@ def symmetry_contacts(pdb_file_path, yasara_scene_path, symmetry_contacts_dict,
     if not has_exit:
         msg = 'Error terminating YASARA: no Exit statement in YASARA log'
         return False, msg
+
+    warned, warning, warn_count = has_logged_warning(yasara_log)
+    if warned:
+        _log.error(warn_count)
+        num_lines = num_lines - warn_count
 
     if not has_expected_log_count_symm(num_lines, symmetry_contacts_dict):
         msg = 'Error creating YASARA scene:' \
@@ -165,7 +174,8 @@ def has_logged_exit(yasara_log):
     """Checks if the last line of the yasara_log is the Exit command.
 
     Return True if the last line is the Exit command.
-    Also return the number of lines in the file up to the end."""
+    Also return the number of lines in the file up to the end.
+    """
     exit_present = False
     num_lines = 0
     try:
@@ -173,10 +183,39 @@ def has_logged_exit(yasara_log):
             for last_line in f:
                 num_lines = num_lines + 1
             _log.debug('Log {}.log has {} lines'.format(yasara_log, num_lines))
-            if re.match('^>Exit$', last_line):
+            if re.search('^>Exit$', last_line):
                 _log.debug('Exit found in last line of {}'.format(yasara_log))
                 exit_present = True
     except IOError as e:
         _log.error(e)
 
     return exit_present, num_lines
+
+
+RE_WARN = re.compile('(WARNING.*?)\n>', re.DOTALL)
+
+
+def has_logged_warning(yasara_log, warning=None):
+    """Checks if 'WARNING' is present in the log.
+
+    Return:
+        True when a Warning is found, False otherwise
+        The warning itself as a string that may span multiple lines, else None
+        The number of lines the warning spans in the YASARA log, else None
+    """
+    warning_present = False
+    warning = None
+    warning_lines = None
+    try:
+        with open(yasara_log + '.log', 'r') as f:
+            log = f.read()
+            m = re.search(RE_WARN, log)
+            if m:
+                warning_present = True
+                warning = m.group(1)
+                warning_lines = warning.count('\n') + 1
+                _log.debug('WARNING found in {}: {}'.format(yasara_log,
+                                                            warning))
+    except IOError as e:
+        _log.error(e)
+    return warning_present, warning, warning_lines
