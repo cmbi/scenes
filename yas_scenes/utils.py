@@ -107,7 +107,7 @@ def set_dir_log_wn(args, mode):
     yas_log = '{}_{}'.format(args.pdb_id, scene_nam)
     yas_log_path = os.path.join(scene_dir, yas_log)
 
-    wn_file_path = os.path.join(scene_dir, '{}_{}.whynot.check'.format(
+    wn_file_path = os.path.join(scene_dir, '{}_{}.whynot'.format(
         args.pdb_id, scene_nam))
     wn_db = '{}_SCENES_{}'.format(args.source, scene_name[mode][1])
 
