@@ -10,7 +10,7 @@ To be decided.
 # Pre-requisites
 
 * [YASARA][1]. The currently supported scenes can be created
-  with YASARA View. Make sure you have at least version 14.7.17.
+  with YASARA View. Make sure you have at least version 16.11.20.
 
 # Installation
 

@@ -1,5 +1,5 @@
 {
-  "YASARA_DIR": "/home/wtouw/bin/yasara",
+  "YASARA_DIR": "/path/to/yasara",
   "PDB_SCENES_ROOT" : "scenes",
   "REDO_SCENES_ROOT" : "scenes",
   "SCENES_NAME" : {

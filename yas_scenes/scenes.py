@@ -8,10 +8,6 @@ import re
 import yasara as yas
 
 
-RE_YASARA_EXIT = re.compile("^Connection to YASARA broken. Either you exited "
-                            "YASARA manually or it encountered a fatal error$")
-
-
 def prepare_yasara(pid, yasara_log=None, n_threads=1):
     """Prepare YASARA for a parallel setting.
 
@@ -189,20 +185,13 @@ def create_sym_scene(pdb_path, sce_path, sym_contacts):
 
 
 def exit_yasara():
-    """Exit yasara without error code.
-
-    Return True if YASARA terminated normally. We assume this is the case when
-    the Exit statement is reached and YASARA exits with the expected
-    Exit message.
+    """Return True if YASARA terminated normally.
 
     Any open YASARA log files will be closed.
     """
-    normal_exit = False
     try:
         _log.debug("Closing YASARA...")
-        yas.Exit(error=None)
+        yas.Exit()
     except RuntimeError as e:
-        if re.match(RE_YASARA_EXIT, str(e)):
-            _log.debug("It seems YASARA terminated normally")
-            return True
-    return normal_exit
+        return False
+    return True

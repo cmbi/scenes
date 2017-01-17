@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
     name='scenes',
-    version='1.1.6',
+    version='1.1.7',
     description='Create YASARA scenes from WHAT IF lists.',
     author='Wouter Touw',
     author_email='wouter.touw@radboudumc.nl',
